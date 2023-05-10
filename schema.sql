@@ -22,15 +22,11 @@ CREATE TABLE employees (
   last_name VARCHAR(50) NOT NULL,
   role_id INT,
   department_id INT,
-  manager VARCHAR(50) NOT NULL,
+  manager_name VARCHAR(50) NOT NULL,
   FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 );
 
--- SELECT employees.id, first_name, last_name, roles.title, departments.name, roles.salary, manager 
--- FROM employees
--- INNER JOIN roles ON employees.role_id = roles.id
--- INNER JOIN departments ON employees.department_id = departments.id;
 
 
 -- SELECT employees.id, first_name, last_name, roles.title, departments.name, roles.salary, manager 

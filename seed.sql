@@ -15,7 +15,7 @@ INSERT INTO roles (title, department_id, salary) VALUES
 ('IT Support', 3, 80000.00);
 
 -- Seed employees data
-INSERT INTO employees (firstname, lastname, role_id, department_id, manager_name)
+INSERT INTO employees (first_name, last_name, role_id, department_id, manager_name)
 VALUES
 -- Sales Department
 ('John', 'Doe', 1, 1, 'Michael Smith'),
