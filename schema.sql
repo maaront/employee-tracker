@@ -12,7 +12,7 @@ CREATE TABLE roles (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(50) NOT NULL,
   department_id INT,
-  salary DECIMAL(10,2) NOT NULL,
+  salary INT,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 );
 
@@ -22,14 +22,20 @@ CREATE TABLE employees (
   last_name VARCHAR(50) NOT NULL,
   role_id INT,
   department_id INT,
+  salary_id INT,
   manager_name VARCHAR(50) NOT NULL,
   FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
+  FOREIGN KEY (salary_id) REFERENCES roles(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 );
 
 
 
--- SELECT employees.id, first_name, last_name, roles.title, departments.name, roles.salary, manager 
+-- SELECT first_name, last_name, roles.title, departments.name, roles.salary, manager 
 -- FROM employees
 -- INNER JOIN roles ON employees.role_id = roles.id
 -- INNER JOIN departments ON employees.department_id = departments.id;
+-- INNER JOIN departments ON employees.department_id = departments.id;
+SOURCE seed.sql;
+
+SELECT * FROM employees;

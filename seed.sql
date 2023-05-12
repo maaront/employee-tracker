@@ -7,12 +7,12 @@ INSERT INTO departments (name) VALUES
 
 -- Seed roles data
 INSERT INTO roles (title, department_id, salary) VALUES
-('Sales Manager', 1, 120000.00),
-('Sales Executive', 1, 85000.00),
-('HR Manager', 2, 100000.00),
-('HR Assistant', 2, 60000.00),
-('IT Manager', 3, 110000.00),
-('IT Support', 3, 80000.00);
+('Sales Manager', 1, 120000),
+('Sales Executive', 1, 85000),
+('HR Manager', 2, 100000),
+('HR Assistant', 2, 60000),
+('IT Manager', 3, 110000),
+('IT Support', 3, 80000);
 
 -- Seed employees data
 INSERT INTO employees (first_name, last_name, role_id, department_id, manager_name)
