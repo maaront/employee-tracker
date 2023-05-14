@@ -174,6 +174,7 @@ inquirer
 }
 
 // Functions to add data to tables
+// Add a department
 function addDepartment() {
     inquirer
       .prompt([
@@ -196,7 +197,7 @@ function addDepartment() {
           console.log('Department added:');
           console.table(results); // I want this to just display the name of the new department
   
-          // View all DBs after adding the department
+          // View all departments after adding the department
           const selectQuery = 'SELECT * FROM departments';
           db.query(selectQuery, (selectErr, selectResults) => {
             if (selectErr) {
@@ -229,6 +230,90 @@ function addDepartment() {
       });
   }
   
+// Add a role
+function addRole() {
+    // Fetch all departments from the database
+    const selectQuery = 'SELECT id, name FROM departments';
+    db.query(selectQuery, (selectErr, selectResults) => {
+      if (selectErr) {
+        console.error('Error retrieving departments:', selectErr);
+        return;
+      }
+  
+      // Map the department names to an array for the inquirer prompt choices
+      const departmentChoices = selectResults.map((department) => ({
+        name: department.name,
+        value: department.id,
+      }));
+  
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            message: 'What is the name of the new role?',
+            name: 'newRole',
+          },
+          {
+            type: 'input',
+            message: 'What is the salary of the new role?',
+            name: 'newSalary',
+          },
+          {
+            type: 'list',
+            message: 'Choose the department for the new role:',
+            name: 'departmentId',
+            choices: departmentChoices,
+          },
+        ])
+        .then((answers) => {
+          const newRole = answers.newRole;
+          const newSalary = answers.newSalary;
+          const departmentId = answers.departmentId;
+          const query =
+            'INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)';
+          const values = [newRole, newSalary, departmentId];
+  
+          db.query(query, values, (err) => {
+            if (err) {
+              console.error('Error adding a role:', err);
+              return;
+            }
+            console.log('Role added: ${newRole}');
+  
+            // View all roles after adding the role
+            const selectQuery = 'SELECT * FROM roles';
+            db.query(selectQuery, (selectErr, selectResults) => {
+              if (selectErr) {
+                console.error('Error retrieving roles:', selectErr);
+                return;
+              }
+              console.log('Roles:');
+              console.table(selectResults);
+  
+              inquirer
+                .prompt([
+                  {
+                    type: 'confirm',
+                    message: 'Do you want to go to the Main Menu?',
+                    name: 'startOver',
+                    default: true,
+                  },
+                ])
+                .then((promptAnswers) => {
+                  if (promptAnswers.startOver) {
+                    startPrompt(); // Restart the prompt
+                  } else {
+                    // Exit the program or perform other actions
+                    console.log('Exiting...');
+                    db.end(); // Close the database connection
+                  }
+                });
+            });
+          });
+        });
+    });
+  }
+   
   
   // Export the startPrompt function
 module.exports = {
