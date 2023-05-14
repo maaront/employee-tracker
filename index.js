@@ -54,6 +54,18 @@ inquirer
           case 'View all employees':
             displayEmployees();
             break;
+          case 'Add a department':
+            displayEmployees();
+            break;
+          case 'Add a role':
+            displayEmployees();
+            break;
+          case 'Add an employee':
+                displayEmployees();
+            break;
+          case 'Update an employee':
+                displayEmployees();
+            break;
           default:
             console.log('Invalid choice.');
             break;
