@@ -55,16 +55,16 @@ inquirer
             displayEmployees();
             break;
           case 'Add a department':
-            displayEmployees();
+            addDepartment();
             break;
           case 'Add a role':
-            displayEmployees();
+            addRole();
             break;
           case 'Add an employee':
-                displayEmployees();
+            addEmployee();
             break;
           case 'Update an employee':
-                displayEmployees();
+            updateEmployee();
             break;
           default:
             console.log('Invalid choice.');
@@ -172,6 +172,53 @@ inquirer
     });
   }
 }
+
+// Functions to add data to tables
+// Add a department
+function addDepartment() {
+    inquirer
+    .prompt([
+      {
+        type: 'input',
+        message: 'What is the name of the new department?',
+        name: 'newDepartment',
+      },
+    ])
+    .then((answers) => {
+    const newDepartment = answers.newDepartment;     
+    const query = 'INSERT INTO departments (name) VALUES (?),';
+    const values = [newDepartment];
+
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error adding a department:', err);
+        return;
+      }
+      console.log('Department added:');
+      console.table(results);
+  
+      inquirer
+        .prompt([
+          {
+            type: 'confirm',
+            message: 'Do you want to go to the Main Menu?',
+            name: 'startOver',
+            default: true,
+          },
+        ])
+        .then((answers) => {
+          if (answers.startOver) {
+            startPrompt(); // Restart the prompt
+          } else {
+            // Exit the program or perform other actions
+            console.log('Exiting...');
+            db.end(); // Close the database connection
+        }
+    });
+});
+});
+}
+
   
   // Export the startPrompt function
 module.exports = {
