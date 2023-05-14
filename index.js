@@ -174,51 +174,61 @@ inquirer
 }
 
 // Functions to add data to tables
-// Add a department
 function addDepartment() {
     inquirer
-    .prompt([
-      {
-        type: 'input',
-        message: 'What is the name of the new department?',
-        name: 'newDepartment',
-      },
-    ])
-    .then((answers) => {
-    const newDepartment = answers.newDepartment;     
-    const query = 'INSERT INTO departments (name) VALUES (?),';
-    const values = [newDepartment];
-
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error adding a department:', err);
-        return;
-      }
-      console.log('Department added:');
-      console.table(results);
+      .prompt([
+        {
+          type: 'input',
+          message: 'What is the name of the new department?',
+          name: 'newDepartment',
+        },
+      ])
+      .then((answers) => {
+        const newDepartment = answers.newDepartment;
+        const query = 'INSERT INTO departments (name) VALUES (?)';
+        const values = [newDepartment];
   
-      inquirer
-        .prompt([
-          {
-            type: 'confirm',
-            message: 'Do you want to go to the Main Menu?',
-            name: 'startOver',
-            default: true,
-          },
-        ])
-        .then((answers) => {
-          if (answers.startOver) {
-            startPrompt(); // Restart the prompt
-          } else {
-            // Exit the program or perform other actions
-            console.log('Exiting...');
-            db.end(); // Close the database connection
-        }
-    });
-});
-});
-}
-
+        db.query(query, values, (err, results) => {
+          if (err) {
+            console.error('Error adding a department:', err);
+            return;
+          }
+          console.log('Department added:');
+          console.table(results); // I want this to just display the name of the new department
+  
+          // View all DBs after adding the department
+          const selectQuery = 'SELECT * FROM departments';
+          db.query(selectQuery, (selectErr, selectResults) => {
+            if (selectErr) {
+              console.error('Error retrieving departments:', selectErr);
+              return;
+            }
+            console.log('Departments:');
+            console.table(selectResults);
+  
+            inquirer
+              .prompt([
+                {
+                  type: 'confirm',
+                  message: 'Do you want to go to the Main Menu?',
+                  name: 'startOver',
+                  default: true,
+                },
+              ])
+              .then((promptAnswers) => {
+                if (promptAnswers.startOver) {
+                  startPrompt(); // Restart the prompt
+                } else {
+                  // Exit the program or perform other actions
+                  console.log('Exiting...');
+                  db.end(); // Close the database connection
+                }
+              });
+          });
+        });
+      });
+  }
+  
   
   // Export the startPrompt function
 module.exports = {
