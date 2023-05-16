@@ -25,7 +25,7 @@ Include screenshots or GIFs demonstrating the functionality of the application.
 - Inquirer
 
 ## Credits
-This project was developed by [Your Name] as part of a coding assignment.
+This project was developed by Matt Turner as part of a coding assignment.
 
 ## License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License].
