@@ -4,23 +4,28 @@ const inquirer = require('inquirer');
 
 // Create a connection to the database
 const db = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
-    password: 'password',
-    database: 'company_db',
-  });
-  
-  // Connect to the database
-  db.connect((err) => {
-    if (err) {
-      console.error('Error connecting to the database:', err);
-      return;
-    }
-    console.log('Connected to the company_db database.');
-    startPrompt();
-  });
+  host: '127.0.0.1',
+  user: 'root',
+  password: 'password',
+  database: 'company_db',
+});
 
+// Connect to the database
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the company_db database.');
+  startPrompt(db);
+});
 
+// Function to exit the application
+function exitApp() {
+  console.log('Exiting...');
+  db.end(); // Close the database connection
+  process.exit(); // Exit the Node.js instance
+}
 
 // Begin user prompts
 function startPrompt() {
@@ -37,7 +42,8 @@ inquirer
         'Add a department',
         'Add a role',
         'Add an employee',
-        'Update an employee role'
+        'Update an employee role',
+        'Exit'
       ],
     },
   ])
@@ -65,6 +71,9 @@ inquirer
             break;
           case 'Update an employee role':
             updateEmployee();
+            break;
+          case 'Exit':
+            exitApp();
             break;
           default:
             console.log('Invalid choice.');
