@@ -17,7 +17,8 @@ The Company Employee Tracker is a command-line application that allows users to 
 4. The application will display the requested data or confirm the successful completion of the operation.
 
 ## Screenshots
-Include screenshots or GIFs demonstrating the functionality of the application.
+<img width="730" alt="Screenshot 2023-05-15 at 9 50 34 PM" src="https://github.com/maaront/employee-tracker/assets/35611834/f1d57606-96cb-4036-a157-f3f50e6c7337">
+
 
 ## Technologies Used
 - Node.js
