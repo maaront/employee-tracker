@@ -23,7 +23,7 @@ CREATE TABLE employees (
   role_id INT,
   department_id INT,
   salary_id INT,
-  manager_name VARCHAR(50) NOT NULL,
+  manager_id INT,
   FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
   FOREIGN KEY (salary_id) REFERENCES roles(id) ON DELETE SET NULL,
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
@@ -31,11 +31,12 @@ CREATE TABLE employees (
 
 
 
+SOURCE seed.sql;
+
+SELECT * FROM employees;
+
 -- SELECT first_name, last_name, roles.title, departments.name, roles.salary, manager 
 -- FROM employees
 -- INNER JOIN roles ON employees.role_id = roles.id
 -- INNER JOIN departments ON employees.department_id = departments.id;
 -- INNER JOIN departments ON employees.department_id = departments.id;
-SOURCE seed.sql;
-
-SELECT * FROM employees;

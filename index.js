@@ -36,7 +36,7 @@ inquirer
         'View all employees',
         'Add a department',
         'Add a role',
-        'Add a employee',
+        'Add an employee',
         'Update an employee role'
       ],
     },
@@ -313,9 +313,167 @@ function addRole() {
         });
     });
   }
-   
+
   
-  // Export the startPrompt function
+
+  function addEmployee() {
+    // Fetch all roles from the database
+    const selectRolesQuery = 'SELECT id, title, salary FROM roles';
+    db.query(selectRolesQuery, (selectRolesErr, selectRolesResults) => {
+      if (selectRolesErr) {
+        console.error('Error retrieving roles:', selectRolesErr);
+        return;
+      }
+  
+      // Map the role names to an array for the inquirer prompt choices
+      const roleChoices = selectRolesResults.map((role) => ({
+        name: role.title,
+        value: role.id,
+        salary: role.salary,
+      }));
+  
+      // Fetch all departments from the database
+      const selectDepartmentsQuery = 'SELECT id, name FROM departments';
+      db.query(selectDepartmentsQuery, (selectDepartmentsErr, selectDepartmentsResults) => {
+        if (selectDepartmentsErr) {
+          console.error('Error retrieving departments:', selectDepartmentsErr);
+          return;
+        }
+  
+        // Map the department names to an array for the inquirer prompt choices
+        const departmentChoices = selectDepartmentsResults.map((department) => ({
+          name: department.name,
+          value: department.id,
+        }));
+  
+        // Fetch all employees from the database
+        const selectEmployeesQuery = 'SELECT id, CONCAT(first_name, " ", last_name) AS full_name FROM employees';
+        db.query(selectEmployeesQuery, (selectEmployeesErr, selectEmployeesResults) => {
+          if (selectEmployeesErr) {
+            console.error('Error retrieving employees:', selectEmployeesErr);
+            return;
+          }
+  
+          // Map the employee names to an array for the inquirer prompt choices
+          const employeeChoices = selectEmployeesResults.map((employee) => ({
+            name: employee.full_name,
+            value: employee.id,
+          }));
+  
+          inquirer
+            .prompt([
+              {
+                type: 'input',
+                message: 'What is the first name of the new employee?',
+                name: 'firstName',
+              },
+              {
+                type: 'input',
+                message: 'What is the last name of the new employee?',
+                name: 'lastName',
+              },
+              {
+                type: 'list',
+                message: 'Choose the role for the new employee:',
+                name: 'roleId',
+                choices: roleChoices,
+              },
+              {
+                type: 'list',
+                message: 'Choose the department for the new employee:',
+                name: 'departmentId',
+                choices: departmentChoices,
+              },
+              {
+                type: 'list',
+                message: 'Choose the manager for the new employee:',
+                name: 'manager_id',
+                choices: employeeChoices,
+              },
+            ])
+            .then((answers) => {
+              const firstName = answers.firstName;
+              const lastName = answers.lastName;
+              const roleId = answers.roleId;
+              const departmentId = answers.departmentId;
+              const manager_id = answers.manager_id;
+  
+          
+
+                const query = 'INSERT INTO employees (first_name, last_name, role_id, department_id, manager_id) VALUES (?, ?, ?, ?, ?)';
+                const values = [firstName, lastName, roleId, departmentId, manager_id];
+                
+            
+                db.query(query, values, (err) => {
+                  if (err) {
+                    console.error('Error adding an employee:', err);
+                    return;
+                  }
+                  console.log(`Employee added: ${firstName} ${lastName}`);
+                
+                // View all employees with role names, department names, and manager names
+                      const selectQuery = `
+                      SELECT 
+                          employees.first_name,
+                          employees.last_name,
+                          roles.title AS role_name,
+                          departments.name AS department_name,
+                          managers.first_name AS manager_first_name,
+                          managers.last_name AS manager_last_name
+                      FROM
+                          employees
+                      JOIN
+                          roles
+                      ON
+                          employees.role_id = roles.id
+                      JOIN
+                          departments
+                      ON
+                          employees.department_id = departments.id
+                      LEFT JOIN
+                          employees AS managers
+                      ON
+                          employees.manager_id = managers.id
+                      `;
+
+                      db.query(selectQuery, (selectErr, selectResults) => {
+                      if (selectErr) {
+                        console.error('Error retrieving employees:', selectErr);
+                        return;
+                      }
+                      console.log('Employees:');
+                      console.table(selectResults);
+                      });
+
+                
+                    inquirer
+                      .prompt([
+                        {
+                          type: 'confirm',
+                          message: 'Do you want to go to the Main Menu?',
+                          name: 'startOver',
+                          default: true,
+                        },
+                      ])
+                      .then((promptAnswers) => {
+                        if (promptAnswers.startOver) {
+                          startPrompt(); // Restart the prompt
+                        } else {
+                          // Exit the program or perform other actions
+                          console.log('Exiting...');
+                          db.end(); // Close the database connection
+                        }
+                      });
+                  });
+                });
+              });``
+            });
+          });
+        });
+    };
+
+// Export the startPrompt function
 module.exports = {
     startPrompt
-  };
+};
+ 
