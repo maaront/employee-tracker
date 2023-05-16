@@ -30,13 +30,3 @@ CREATE TABLE employees (
 );
 
 
-
-SOURCE seed.sql;
-
-SELECT * FROM employees;
-
--- SELECT first_name, last_name, roles.title, departments.name, roles.salary, manager 
--- FROM employees
--- INNER JOIN roles ON employees.role_id = roles.id
--- INNER JOIN departments ON employees.department_id = departments.id;
--- INNER JOIN departments ON employees.department_id = departments.id;
