@@ -63,7 +63,7 @@ inquirer
           case 'Add an employee':
             addEmployee();
             break;
-          case 'Update an employee':
+          case 'Update an employee role':
             updateEmployee();
             break;
           default:
@@ -101,6 +101,7 @@ inquirer
             // Exit the program or perform other actions
             console.log('Exiting...');
             db.end(); // Close the database connection
+            process.exit(); // Exit the Node.js process
           }
         });
     });
@@ -133,6 +134,7 @@ inquirer
             // Exit the program or perform other actions
             console.log('Exiting...');
             db.end(); // Close the database connection
+            process.exit(); // Exit the Node.js process
           }
         });
     });
@@ -140,16 +142,38 @@ inquirer
   
   // Employees
   function displayEmployees() {
-    const query = 'SELECT * FROM employees';
+    // View all employees with role names, department names, and manager names
+    const selectQuery = `
+    SELECT 
+        employees.first_name,
+        employees.last_name,
+        roles.title AS role_name,
+        departments.name AS department_name,
+        managers.first_name AS manager_first_name,
+        managers.last_name AS manager_last_name
+    FROM
+        employees
+    JOIN
+        roles
+    ON
+        employees.role_id = roles.id
+    JOIN
+        departments
+    ON
+        employees.department_id = departments.id
+    LEFT JOIN
+        employees AS managers
+    ON
+        employees.manager_id = managers.id
+  `;
 
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error retrieving employees:', err);
-        return;
-      }
-  
-      console.log('Employees:');
-      console.table(results);
+  db.query(selectQuery, (selectErr, selectResults) => {
+    if (selectErr) {
+      console.error('Error retrieving employees:', selectErr);
+      return;
+    }
+    console.log('Employees:');
+    console.table(selectResults);
   
       inquirer
         .prompt([
@@ -167,6 +191,7 @@ inquirer
             // Exit the program or perform other actions
             console.log('Exiting...');
             db.end(); // Close the database connection
+            process.exit(); // Exit the Node.js process
           }
         });
     });
@@ -223,6 +248,7 @@ function addDepartment() {
                   // Exit the program or perform other actions
                   console.log('Exiting...');
                   db.end(); // Close the database connection
+                  process.exit(); // Exit the Node.js process
                 }
               });
           });
@@ -306,6 +332,7 @@ function addRole() {
                     // Exit the program or perform other actions
                     console.log('Exiting...');
                     db.end(); // Close the database connection
+                    process.exit(); // Exit the Node.js process
                   }
                 });
             });
@@ -412,38 +439,37 @@ function addRole() {
                   console.log(`Employee added: ${firstName} ${lastName}`);
                 
                 // View all employees with role names, department names, and manager names
-                      const selectQuery = `
-                      SELECT 
-                          employees.first_name,
-                          employees.last_name,
-                          roles.title AS role_name,
-                          departments.name AS department_name,
-                          managers.first_name AS manager_first_name,
-                          managers.last_name AS manager_last_name
-                      FROM
-                          employees
-                      JOIN
-                          roles
-                      ON
-                          employees.role_id = roles.id
-                      JOIN
-                          departments
-                      ON
-                          employees.department_id = departments.id
-                      LEFT JOIN
-                          employees AS managers
-                      ON
-                          employees.manager_id = managers.id
-                      `;
+                const selectQuery = `
+                  SELECT 
+                      employees.first_name,
+                      employees.last_name,
+                      roles.title AS role_name,
+                      departments.name AS department_name,
+                      managers.first_name AS manager_first_name,
+                      managers.last_name AS manager_last_name
+                  FROM
+                      employees
+                  JOIN
+                      roles
+                  ON
+                      employees.role_id = roles.id
+                  JOIN
+                      departments
+                  ON
+                      employees.department_id = departments.id
+                  LEFT JOIN
+                      employees AS managers
+                  ON
+                      employees.manager_id = managers.id
+                `;
 
-                      db.query(selectQuery, (selectErr, selectResults) => {
-                      if (selectErr) {
-                        console.error('Error retrieving employees:', selectErr);
-                        return;
-                      }
-                      console.log('Employees:');
-                      console.table(selectResults);
-                      });
+                db.query(selectQuery, (selectErr, selectResults) => {
+                  if (selectErr) {
+                    console.error('Error retrieving employees:', selectErr);
+                    return;
+                  }
+                  console.log('Employees:');
+                  console.table(selectResults);
 
                 
                     inquirer
@@ -462,6 +488,7 @@ function addRole() {
                           // Exit the program or perform other actions
                           console.log('Exiting...');
                           db.end(); // Close the database connection
+                          process.exit(); // Exit the Node.js process
                         }
                       });
                   });
@@ -471,6 +498,77 @@ function addRole() {
           });
         });
     };
+
+    function updateEmployee() {
+      // Fetch all employees from the database
+      const selectEmployeesQuery = 'SELECT id, CONCAT(first_name, " ", last_name) AS full_name FROM employees';
+      db.query(selectEmployeesQuery, (selectEmployeesErr, selectEmployeesResults) => {
+        if (selectEmployeesErr) {
+          console.error('Error retrieving employees:', selectEmployeesErr);
+          return;
+        }
+    
+        // Map the employee names to an array for the inquirer prompt choices
+        const employeeChoices = selectEmployeesResults.map((employee) => ({
+          name: employee.full_name,
+          value: employee.id,
+        }));
+    
+        // Fetch all roles from the database
+        const selectRolesQuery = 'SELECT id, title FROM roles';
+        db.query(selectRolesQuery, (selectRolesErr, selectRolesResults) => {
+          if (selectRolesErr) {
+            console.error('Error retrieving roles:', selectRolesErr);
+            return;
+          }
+    
+          // Map the role names to an array for the inquirer prompt choices
+          const roleChoices = selectRolesResults.map((role) => ({
+            name: role.title,
+            value: role.id,
+          }));
+    
+          // Ask the user to select the employee and the new role
+          inquirer
+            .prompt([
+              {
+                type: 'list',
+                message: 'Which employee do you want to update?',
+                name: 'employeeId',
+                choices: employeeChoices,
+              },
+              {
+                type: 'list',
+                message: 'Choose the updated role for the employee:',
+                name: 'roleId',
+                choices: roleChoices,
+              },
+            ])
+            .then((answers) => {
+              const employeeId = answers.employeeId;
+              const roleId = answers.roleId;
+    
+              const query = 'UPDATE employees SET role_id = ? WHERE id = ?';
+              const values = [roleId, employeeId];
+    
+              db.query(query, values, (err) => {
+                if (err) {
+                  console.error('Error updating the employee role:', err);
+                  return;
+                }
+                console.log('Employee role updated.');
+    
+                // Restart the prompt
+                startPrompt();
+              });
+            });
+        });
+      });
+    }
+    
+    
+    
+
 
 // Export the startPrompt function
 module.exports = {
